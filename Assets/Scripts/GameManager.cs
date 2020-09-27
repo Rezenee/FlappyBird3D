@@ -1,0 +1,238 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
+public class GameManager : MonoBehaviour
+{
+
+    public GameObject bird;
+    public GameObject ground;
+    public GameObject pipe;
+
+    public GameObject panelStart;
+    public GameObject panelPlay;
+    public GameObject panelGameOver;
+
+    public Text scoreText;
+    public Text gameOverScoreText;
+
+    public AudioSource flap;
+    public AudioSource deathSound;
+    public AudioSource pointScored;
+
+    private GameObject birdObject;
+    private GameObject pipe1;
+    private GameObject pipe2;
+    private GameObject pipe3;
+    private GameObject pipe4;
+    private GameObject ground1;
+    private GameObject ground2;
+
+    public bool gameOver = false;
+    public float yGravity = .45f;
+    public int pipeDistance;
+    private int pipeCount;
+    private int groundCount;
+    private bool jumpKey;
+    private int _score;
+
+    private GameObject[] pipes;
+    public static GameManager Instance { get; private set; }
+    public enum State { MENU, INIT, PLAY, GAMEOVER }
+
+    State _state;
+    public int Score
+    {
+        get { return _score; }
+        set { _score = value;
+            scoreText.text = "SCORE: " + _score;
+            gameOverScoreText.text = scoreText.text;
+        }
+    }
+    public void PlayClicked()
+    {
+        SwitchState(State.INIT);
+    }
+    public void SwitchState(State newState, float delay = 0)
+    {
+        StartCoroutine(SwitchDelay(newState, delay));
+    }
+    IEnumerator SwitchDelay(State newState, float delay)
+    {
+
+        yield return new WaitForSeconds(delay);
+        EndState();
+        _state = newState;
+        BeginState(newState);
+
+    }
+    void Start()
+    {
+        Instance = this;
+        SwitchState(State.MENU);
+    }
+    void BeginState(State newState)
+    {
+        switch (newState)
+        {
+            case State.MENU:
+                Cursor.visible = true;
+                panelStart.SetActive(true);
+
+                pipeCount = 2;
+                groundCount = 0;
+                break;
+            case State.INIT:
+                Cursor.visible = false;
+                panelPlay.SetActive(true);
+                Score = 0;
+                birdObject = Instantiate(bird);
+                pipe1 = Instantiate(pipe, new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0), Quaternion.identity);
+                pipes.Add(pipe1);
+                pipeCount++;
+                pipe2 = Instantiate(pipe, new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0), Quaternion.identity);
+                pipeCount++;
+                pipe3 = Instantiate(pipe, new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0), Quaternion.identity);
+                pipeCount++;
+                pipe4 = Instantiate(pipe, new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0), Quaternion.identity);
+                pipeCount++;
+                ground1 = Instantiate(ground, new Vector3(160 * groundCount + 80, 0, 68), Quaternion.identity);
+                groundCount++;
+                ground2 = Instantiate(ground, new Vector3(160 * groundCount + 80, 0, 68), Quaternion.identity);
+                groundCount++;
+                SwitchState(State.PLAY);
+                break;
+            case State.PLAY:
+                break;
+            case State.GAMEOVER:
+                Destroy(pipe1);
+                Destroy(pipe2);
+                Destroy(pipe3);
+                Destroy(pipe4);
+                Destroy(ground1);
+                Destroy(ground2);
+                panelGameOver.SetActive(true);
+                break;
+        }
+    }
+    void EndState()
+    {
+        switch (_state)
+        {
+            case State.MENU:
+                panelStart.SetActive(false);
+                break;
+            case State.INIT:
+                break;
+            case State.PLAY:
+                break;
+            case State.GAMEOVER:
+                panelPlay.SetActive(false);
+                panelGameOver.SetActive(false);
+                break;
+        }
+    }
+    void Update()
+    {
+        switch (_state)
+        {
+            case State.MENU:
+                break;
+            case State.INIT:
+                break;
+            case State.PLAY:
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    jumpKey = true;
+                }
+                if (gameOver)
+                {
+                    deathSound.Play();
+                    SwitchState(State.GAMEOVER);
+                }
+                Rigidbody _BirdRigidbody = birdObject.GetComponent<Rigidbody>();
+                Rigidbody _Pipe1Rigidbody = pipe1.GetComponent<Rigidbody>();
+                Rigidbody _Pipe2Rigidbody = pipe2.GetComponent<Rigidbody>();
+                Rigidbody _Pipe3Rigidbody = pipe3.GetComponent<Rigidbody>();
+                Rigidbody _Pipe4Rigidbody = pipe4.GetComponent<Rigidbody>();
+                Rigidbody _Ground1RigidBody = ground1.GetComponent<Rigidbody>();
+                Rigidbody _Ground2RigidBody = ground2.GetComponent<Rigidbody>();
+
+                if (_BirdRigidbody.position.x > _Pipe1Rigidbody.position.x)
+                {
+                    _Pipe1Rigidbody.MovePosition(new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0));
+                    pipeCount++;
+                    Score++;
+                    pointScored.Play();
+                }
+                if (_BirdRigidbody.position.x > _Pipe2Rigidbody.position.x)
+                {
+                    _Pipe2Rigidbody.MovePosition(new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0));
+                    pipeCount++;
+                    Score++;
+                    pointScored.Play();
+
+                }
+                if (_BirdRigidbody.position.x > _Pipe3Rigidbody.position.x)
+                {
+                    _Pipe3Rigidbody.MovePosition(new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0));
+                    pipeCount++;
+                    Score++;
+                    pointScored.Play();
+
+                }
+                if (_BirdRigidbody.position.x > _Pipe4Rigidbody.position.x)
+                {
+                    _Pipe4Rigidbody.MovePosition(new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0));
+                    pipeCount++;
+                    Score++;
+                    pointScored.Play();
+
+                }
+                if (_BirdRigidbody.position.x > _Ground1RigidBody.position.x + 78)
+                {
+                    float x = _Ground1RigidBody.position.x;
+                    _Ground1RigidBody.MovePosition(new Vector3(x + 320, 0, 0));
+                    groundCount++;
+                }
+                if (_BirdRigidbody.position.x > _Ground2RigidBody.position.x + 78)
+                {
+                    float x = _Ground2RigidBody.position.x;
+                    _Ground2RigidBody.MovePosition(new Vector3(x + 320, 0, 68));
+                    groundCount++;
+                }
+
+                break;
+            case State.GAMEOVER:
+                if (Input.anyKeyDown)
+                {
+                    SwitchState(State.MENU);
+                }
+                gameOver = false;
+                break;
+        }
+
+    }
+
+    private void FixedUpdate()
+    {
+        Rigidbody _rigidbody = birdObject.GetComponent<Rigidbody>();
+        if (jumpKey)
+        {
+            Vector3 vel1 = _rigidbody.velocity;
+            vel1.y = 0;
+            _rigidbody.velocity = vel1;
+            _rigidbody.AddForce(Vector3.up * 8, ForceMode.VelocityChange);
+            flap.Play();
+            jumpKey = false;
+        }
+        Vector3 vel = _rigidbody.velocity;
+        vel.x = 5;
+        vel.y -= yGravity;
+        _rigidbody.velocity = vel;
+    }
+
+
+}

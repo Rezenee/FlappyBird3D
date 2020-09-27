@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 04db75fda4c3b4546a8f10adc92481ab
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - bird: {fileID: 5922239428239387652, guid: caf45e62cce18b7448970e0f41fda7b7, type: 3}
+  - pipe1: {instanceID: 0}
+  - pipe2: {instanceID: 0}
+  - pipe3: {instanceID: 0}
+  - pipe4: {instanceID: 0}
+  - scoreText: {instanceID: 0}
+  - panelStart: {instanceID: 0}
+  - panelPlay: {instanceID: 0}
+  - panelGameOver: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
