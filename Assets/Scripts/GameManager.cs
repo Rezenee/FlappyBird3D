@@ -23,10 +23,8 @@ public class GameManager : MonoBehaviour
     public AudioSource pointScored;
 
     private GameObject birdObject;
-    private GameObject pipe1;
-    private GameObject pipe2;
-    private GameObject pipe3;
-    private GameObject pipe4;
+    public static int pipesSpawned = 20;
+    private GameObject[] pipes = new GameObject[pipesSpawned];
     private GameObject ground1;
     private GameObject ground2;
 
@@ -36,9 +34,10 @@ public class GameManager : MonoBehaviour
     private int pipeCount;
     private int groundCount;
     private bool jumpKey;
+    public int horizontalMovementSpeed;
+    private float horizontalInput;
     private int _score;
 
-    private GameObject[] pipes;
     public static GameManager Instance { get; private set; }
     public enum State { MENU, INIT, PLAY, GAMEOVER }
 
@@ -89,15 +88,12 @@ public class GameManager : MonoBehaviour
                 panelPlay.SetActive(true);
                 Score = 0;
                 birdObject = Instantiate(bird);
-                pipe1 = Instantiate(pipe, new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0), Quaternion.identity);
-                pipes.Add(pipe1);
-                pipeCount++;
-                pipe2 = Instantiate(pipe, new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0), Quaternion.identity);
-                pipeCount++;
-                pipe3 = Instantiate(pipe, new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0), Quaternion.identity);
-                pipeCount++;
-                pipe4 = Instantiate(pipe, new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0), Quaternion.identity);
-                pipeCount++;
+                print(pipes.Length);
+                for(int i = 0; i < pipes.Length; i++)
+                {
+                    pipes[i] = Instantiate(pipe, new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), UnityEngine.Random.Range(-9, 9)), Quaternion.identity);
+                    pipeCount++;
+                }
                 ground1 = Instantiate(ground, new Vector3(160 * groundCount + 80, 0, 68), Quaternion.identity);
                 groundCount++;
                 ground2 = Instantiate(ground, new Vector3(160 * groundCount + 80, 0, 68), Quaternion.identity);
@@ -107,12 +103,13 @@ public class GameManager : MonoBehaviour
             case State.PLAY:
                 break;
             case State.GAMEOVER:
-                Destroy(pipe1);
-                Destroy(pipe2);
-                Destroy(pipe3);
-                Destroy(pipe4);
+                for(int i=0; i < pipes.Length; i++)
+                {
+                    Destroy(pipes[i]);
+                }
                 Destroy(ground1);
                 Destroy(ground2);
+                Destroy(birdObject);
                 panelGameOver.SetActive(true);
                 break;
         }
@@ -147,48 +144,35 @@ public class GameManager : MonoBehaviour
                 {
                     jumpKey = true;
                 }
+                horizontalInput = Input.GetAxis("Horizontal");
                 if (gameOver)
                 {
                     deathSound.Play();
                     SwitchState(State.GAMEOVER);
                 }
                 Rigidbody _BirdRigidbody = birdObject.GetComponent<Rigidbody>();
-                Rigidbody _Pipe1Rigidbody = pipe1.GetComponent<Rigidbody>();
-                Rigidbody _Pipe2Rigidbody = pipe2.GetComponent<Rigidbody>();
-                Rigidbody _Pipe3Rigidbody = pipe3.GetComponent<Rigidbody>();
-                Rigidbody _Pipe4Rigidbody = pipe4.GetComponent<Rigidbody>();
+
                 Rigidbody _Ground1RigidBody = ground1.GetComponent<Rigidbody>();
                 Rigidbody _Ground2RigidBody = ground2.GetComponent<Rigidbody>();
-
-                if (_BirdRigidbody.position.x > _Pipe1Rigidbody.position.x)
+                // At spawn _bird z is between -1 and 1;
+                
+                // && _BirdRigidbody.position.z -1 >_PipeRigidBody.position.z  && _BirdRigidbody.position.z + 1 < _PipeRigidBody.position.z
+                for (int i=0; i < pipes.Length; i++)
                 {
-                    _Pipe1Rigidbody.MovePosition(new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0));
-                    pipeCount++;
-                    Score++;
-                    pointScored.Play();
-                }
-                if (_BirdRigidbody.position.x > _Pipe2Rigidbody.position.x)
-                {
-                    _Pipe2Rigidbody.MovePosition(new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0));
-                    pipeCount++;
-                    Score++;
-                    pointScored.Play();
-
-                }
-                if (_BirdRigidbody.position.x > _Pipe3Rigidbody.position.x)
-                {
-                    _Pipe3Rigidbody.MovePosition(new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0));
-                    pipeCount++;
-                    Score++;
-                    pointScored.Play();
-
-                }
-                if (_BirdRigidbody.position.x > _Pipe4Rigidbody.position.x)
-                {
-                    _Pipe4Rigidbody.MovePosition(new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), 0));
-                    pipeCount++;
-                    Score++;
-                    pointScored.Play();
+                    Rigidbody _PipeRigidBody = pipes[i].GetComponent<Rigidbody>();
+                    print(_PipeRigidBody.position.z);
+                    if (_BirdRigidbody.position.x > _PipeRigidBody.position.x)
+                        if(_BirdRigidbody.position.z + 1 > _PipeRigidBody.position.z &&  _BirdRigidbody.position.z -1 < _PipeRigidBody.position.z)
+                        {
+                            _PipeRigidBody.MovePosition(new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), UnityEngine.Random.Range(-9, 9)));
+                            pipeCount++;
+                            Score++;
+                            pointScored.Play();
+                        }
+                        else
+                        {
+                            gameOver = true;
+                        }
 
                 }
                 if (_BirdRigidbody.position.x > _Ground1RigidBody.position.x + 78)
@@ -203,7 +187,6 @@ public class GameManager : MonoBehaviour
                     _Ground2RigidBody.MovePosition(new Vector3(x + 320, 0, 68));
                     groundCount++;
                 }
-
                 break;
             case State.GAMEOVER:
                 if (Input.anyKeyDown)
@@ -219,12 +202,13 @@ public class GameManager : MonoBehaviour
     private void FixedUpdate()
     {
         Rigidbody _rigidbody = birdObject.GetComponent<Rigidbody>();
+        _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, _rigidbody.velocity.y, -horizontalInput * horizontalMovementSpeed);
         if (jumpKey)
         {
             Vector3 vel1 = _rigidbody.velocity;
             vel1.y = 0;
             _rigidbody.velocity = vel1;
-            _rigidbody.AddForce(Vector3.up * 8, ForceMode.VelocityChange);
+            _rigidbody.AddForce(Vector3.up * 12, ForceMode.VelocityChange);
             flap.Play();
             jumpKey = false;
         }

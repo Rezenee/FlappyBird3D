@@ -158,17 +158,18 @@ MonoBehaviour:
   bird: {fileID: 5922239428239387652, guid: caf45e62cce18b7448970e0f41fda7b7, type: 3}
   ground: {fileID: 8526800873643437667, guid: 9da5a7423fee881459cb60df632accec, type: 3}
   pipe: {fileID: 7792215792890066961, guid: 7e2be1f5996d2a345b5368797de2175b, type: 3}
-  scoreText: {fileID: 205482064}
-  gameOverScoreText: {fileID: 666732072}
-  pipeDistance: 8
   panelStart: {fileID: 1448259796}
   panelPlay: {fileID: 738887514}
   panelGameOver: {fileID: 2123291819}
-  gameOver: 0
-  yGravity: 0.45
+  scoreText: {fileID: 205482064}
+  gameOverScoreText: {fileID: 666732072}
   flap: {fileID: 159024271}
   deathSound: {fileID: 159024270}
   pointScored: {fileID: 159024269}
+  gameOver: 0
+  yGravity: 0.65
+  pipeDistance: 8
+  horizontalMovementSpeed: 10
 --- !u!4 &159024268
 Transform:
   m_ObjectHideFlags: 0
