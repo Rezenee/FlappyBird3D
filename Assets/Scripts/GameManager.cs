@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ public class GameManager : MonoBehaviour
     public GameObject bird;
     public GameObject ground;
     public GameObject pipe;
-
+    public GameObject cloud;
     public GameObject panelStart;
     public GameObject panelPlay;
     public GameObject panelGameOver;
@@ -25,6 +26,7 @@ public class GameManager : MonoBehaviour
     private GameObject birdObject;
     public static int pipesSpawned = 20;
     private GameObject[] pipes = new GameObject[pipesSpawned];
+    private GameObject[] clouds = new GameObject[2];
     private GameObject ground1;
     private GameObject ground2;
 
@@ -33,6 +35,7 @@ public class GameManager : MonoBehaviour
     public int pipeDistance;
     private int pipeCount;
     private int groundCount;
+    private int cloudCount;
     private bool jumpKey;
     public int horizontalMovementSpeed;
     private float horizontalInput;
@@ -82,6 +85,7 @@ public class GameManager : MonoBehaviour
 
                 pipeCount = 2;
                 groundCount = 0;
+                cloudCount = 0;
                 break;
             case State.INIT:
                 Cursor.visible = false;
@@ -93,6 +97,11 @@ public class GameManager : MonoBehaviour
                 {
                     pipes[i] = Instantiate(pipe, new Vector3(pipeDistance * pipeCount, UnityEngine.Random.Range(2, 10), UnityEngine.Random.Range(-9, 9)), Quaternion.identity);
                     pipeCount++;
+                }
+                for(int i=0; i< clouds.Length; i++)
+                {
+                    clouds[i] = Instantiate(cloud, new Vector3(160 * cloudCount + 80, 40, 0), Quaternion.Euler (90,0,0));
+                    cloudCount++;
                 }
                 ground1 = Instantiate(ground, new Vector3(160 * groundCount + 80, 0, 68), Quaternion.identity);
                 groundCount++;
@@ -106,6 +115,10 @@ public class GameManager : MonoBehaviour
                 for(int i=0; i < pipes.Length; i++)
                 {
                     Destroy(pipes[i]);
+                }
+                for (int i = 0; i < clouds.Length; i++)
+                {
+                    Destroy(clouds[i]);
                 }
                 Destroy(ground1);
                 Destroy(ground2);
@@ -141,6 +154,10 @@ public class GameManager : MonoBehaviour
                 break;
             case State.PLAY:
                 if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    jumpKey = true;
+                }
+                if (Input.GetMouseButtonDown(0))
                 {
                     jumpKey = true;
                 }

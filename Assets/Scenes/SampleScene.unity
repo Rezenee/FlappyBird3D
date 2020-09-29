@@ -158,6 +158,7 @@ MonoBehaviour:
   bird: {fileID: 5922239428239387652, guid: caf45e62cce18b7448970e0f41fda7b7, type: 3}
   ground: {fileID: 8526800873643437667, guid: 9da5a7423fee881459cb60df632accec, type: 3}
   pipe: {fileID: 7792215792890066961, guid: 7e2be1f5996d2a345b5368797de2175b, type: 3}
+  cloud: {fileID: 3700422594813411119, guid: 0e2d57ec5edbe4d4181ace34d79f7e2d, type: 3}
   panelStart: {fileID: 1448259796}
   panelPlay: {fileID: 738887514}
   panelGameOver: {fileID: 2123291819}
